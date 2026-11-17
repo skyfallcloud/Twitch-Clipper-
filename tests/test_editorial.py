@@ -51,6 +51,16 @@ class EditorialTests(unittest.TestCase):
         self.assertIsNone(invalid["clips"][0]["messages_chat"])
         self.assertTrue(invalid["avertissement_chat"])
 
+    def test_chat_ranking_is_bounded_and_optional(self):
+        a = {"debut": 0, "fin": 10, "score_technique": .7}
+        b = {"debut": 20, "fin": 30, "score_technique": .6}
+        candidates = [a, b]
+        self.assertEqual(editorial.classer(candidates, None, 40), candidates)
+        self.assertEqual(editorial.classer(candidates, [21] * 19, 40), candidates)
+        self.assertEqual(editorial.classer(candidates, [21] * 20, 40), [b, a])
+        a["score_technique"] = .9
+        self.assertEqual(editorial.classer(candidates, [21] * 20, 40), candidates)
+
     def test_auto_provenance(self):
         source = self.lot / "VOD-123.mp4"
         result = editorial.auto(self.lot, source)
