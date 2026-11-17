@@ -57,6 +57,32 @@ def compter(offsets, debut, fin):
     return bisect_left(offsets, fin) - bisect_left(offsets, debut)
 
 
+def classer(candidats, offsets, duree_source):
+    """Bonus borné du chat sur les candidats techniques existants, sans promesse de viralité."""
+    if offsets is None or len(offsets) < 20 or duree_source <= 0:
+        return candidats
+    moyenne = len(offsets) / duree_source
+
+    def score(c):
+        duree = c["fin"] - c["debut"]
+        densite = compter(offsets, c["debut"], c["fin"]) / duree if duree > 0 else 0
+        bonus = .15 * min(1., max(0., (densite / moyenne - 1.) / 2.))
+        return c["score_technique"] + bonus
+
+    return sorted(candidats, key=score, reverse=True)
+
+
+def candidats_chat(candidats, source, duree_source):
+    source = Path(source)
+    chat = source.with_name(source.stem + "_chat.json")
+    if not chat.is_file():
+        return candidats
+    try:
+        return classer(candidats, temps_chat(chat), duree_source)
+    except (OSError, ValueError, TypeError):
+        return candidats
+
+
 def brouillons(clip, credit="", source_url=""):
     titre = texte(clip.get("titre")) or "Extrait à titrer"
     description = texte(clip.get("description"))
