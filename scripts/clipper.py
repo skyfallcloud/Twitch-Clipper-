@@ -30,6 +30,8 @@ DEFAUTS = {
     "sous_titres": "automatiques",
     "priorite": "moments compréhensibles hors du live",
     "dossier_clips": "exports",
+    "categorie": "general",
+    "credit": "",
 }
 
 
@@ -44,6 +46,8 @@ def options_style(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--langue", choices=("fr", "en", "auto"))
     parser.add_argument("--sous-titres", choices=("automatiques", "sans"))
     parser.add_argument("--priorite", help="Types de moments à privilégier lors de la sélection")
+    parser.add_argument("--categorie", choices=editorial.PROFILS, help="Profil éditorial de la chaîne")
+    parser.add_argument("--credit", help="Crédit à proposer dans les brouillons ; ne vaut pas autorisation")
     parser.add_argument("--dossier-clips", help="Dossier de réception des clips manuels et automatiques")
 
 
@@ -68,6 +72,8 @@ def profil(args: argparse.Namespace) -> dict:
     ):
         if valeurs[key] not in choices:
             raise ValueError(f"Valeur invalide pour {key}")
+    if valeurs["categorie"] not in editorial.PROFILS or not isinstance(valeurs["credit"], str):
+        raise ValueError("Catégorie ou crédit éditorial invalide")
     if not isinstance(valeurs["priorite"], str):
         raise ValueError("La priorité doit être une consigne écrite")
     if not isinstance(valeurs["dossier_clips"], str) or not valeurs["dossier_clips"].strip():
@@ -115,7 +121,8 @@ def titres_proposes(clip: dict, mots: list[dict], index: int) -> list[str]:
     return list(dict.fromkeys(options))[:3]
 
 
-def produire_lot(source: Path, travail: Path, dossier_parent: Path, clips: list[dict]) -> None:
+def produire_lot(source: Path, travail: Path, dossier_parent: Path, clips: list[dict], *,
+                 categorie: str = "general", credit: str = "") -> None:
     analyse = clipping.lire_json(travail / "analyse.json")
     choix = travail / "choix.json"
     clipping.ecrire_json(choix, {"source": analyse["source"], "clips": clips})
@@ -124,7 +131,7 @@ def produire_lot(source: Path, travail: Path, dossier_parent: Path, clips: list[
     for fichier in ("analyse.json", "transcription.json"):
         shutil.copyfile(travail / fichier, rendu / fichier)
     try:
-        editorial.auto(rendu, source)
+        editorial.auto(rendu, source, categorie=categorie, credit=credit)
     except (OSError, ValueError, KeyError, TypeError) as exc:
         print(f"Revue éditoriale à régénérer : {exc}", file=sys.stderr)
     base = dossier_parent / "apercus"
@@ -222,7 +229,8 @@ def traiter(args: argparse.Namespace, styles: dict) -> None:
             for clip in premiere:
                 clip["sous_titres"] = []
         premiere = clipping.valider_choix({"clips": premiere}, meta["duree"])
-        produire_lot(source, travail, dossier_parent, premiere)
+        produire_lot(source, travail, dossier_parent, premiere,
+                     categorie=styles["categorie"], credit=styles["credit"])
         if len(premiere) < cible:
             print(f"{len(premiere)} clip(s) sur {cible} : passages distincts disponibles insuffisants "
                   "avec les timecodes ou la durée retenus.")
