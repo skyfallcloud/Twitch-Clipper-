@@ -4,9 +4,20 @@ Transforme une rediffusion Twitch ou une vidéo locale en aperçus verticaux pou
 
 ## Ouvrir avec Claude Code ou Codex
 
-Envoie **le lien de ce dépôt** à ton assistant de code, depuis une session qui peut cloner le dépôt, accéder à tes fichiers et exécuter des commandes sur ta machine. L’assistant lit `AGENTS.md` ou `CLAUDE.md`, lance le diagnostic et te pose les questions de départ en un seul message. Après tes réponses, il enregistre le profil puis lance un aperçu. Tu peux répondre **« utilise les réglages proposés »** au lieu de tout choisir.
+Ouvre une session qui peut cloner le dépôt, accéder à tes fichiers et exécuter des commandes sur ta machine. Copie le prompt ci-dessous dans cette session. Tu peux répondre **« utilise les réglages proposés »** pour lancer la démo avec les réglages par défaut.
 
-Si l’assistant te demande une consigne, écris **« Suis le démarrage guidé de Twitch Clipper. »** Une conversation sans accès au terminal peut te donner les commandes à copier ci-dessous. Une session distante doit avoir accès à la vidéo et à FFmpeg dans son propre environnement.
+### Prompt à copier
+
+```text
+Je veux essayer Twitch Clipper.
+https://github.com/skyfallcloud/Twitch-Clipper-
+
+Ouvre le dépôt et suis son README et ses consignes de démarrage. Lance le diagnostic de ma machine, puis pose-moi en un seul message les questions sur la source, les moments à privilégier, le nombre et la durée des clips, le cadrage, le titre et ses couleurs, les sous-titres et le dossier de réception. Propose des réglages par défaut.
+
+Après mes réponses, lance un premier aperçu en 9:16 et donne-moi le chemin exact du MP4. Si je n’ai pas de vidéo, utilise le MP4 de démonstration inclus. Si tu ne peux pas exécuter de commandes, donne-moi celles à copier dans mon terminal.
+```
+
+Le README et les consignes du dépôt guident la session lorsqu’elle travaille sur le projet. Le diagnostic et le rendu démarrent à la demande, lorsque l’assistant peut exécuter les commandes. Une session distante doit avoir accès à la vidéo et à FFmpeg dans son propre environnement. Tu peux aussi lancer la démo depuis le terminal.
 
 ## Premier aperçu sans compte
 
