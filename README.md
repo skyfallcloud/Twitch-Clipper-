@@ -97,3 +97,27 @@ Pour une VOD publique que tu as le droit d’utiliser, installe [TwitchDownloade
 Valide le MP4 et sa légende avant de programmer une publication. Le [guide PlugKit](AUTOMATISATION.md#plugkit-du-clip-validé-au-calendrier) explique comment créer un brouillon, programmer sur plusieurs comptes et vérifier le statut par destination. Les connexions à Twitch et PlugKit se configurent avec tes propres comptes.
 
 [Provenance du moteur et du média d’exemple](third_party/NOTICE.md)
+
+## Revue éditoriale locale
+
+Après chaque nouveau lot, le clipper génère automatiquement `editorial.md` (à relire) et `editorial.json` (structuré). Aucun compte ni service de clipping externe n'est nécessaire. Si le chat de la VOD est disponible, son activité peut donner un bonus borné aux passages déjà repérés techniquement ; sans chat ou avec trop peu de messages, le classement technique reste inchangé. Le chat n'est pas une prédiction de viralité.
+
+Choisis une catégorie et, si pertinent, le crédit proposé dans les légendes :
+
+```bash
+python scripts/clipper.py configurer --categorie gaming --credit "@createur"
+```
+
+Catégories : general, gaming, podcast, humour, sport, education, musique, interview. Elles fournissent des consignes de revue éditoriale ; elles ne constituent pas un modèle de détection spécialisé.
+
+Pour refaire la revue d'un lot déjà généré :
+
+```bash
+python scripts/editorial.py CHEMIN_DU_LOT --categorie gaming --credit "@createur" --droits a_verifier --spoiler a_verifier
+```
+
+Le rapport propose des brouillons de légendes pour TikTok, Instagram, YouTube Shorts, X et Threads, une image candidate de couverture, les signaux du chat et du début du clip, et des alertes de similarité textuelle au sein du lot. Relis les légendes, les premières secondes, les sous-titres, le cadrage et les droits avant tout partage. Les statuts de droits et de spoilers sont des déclarations humaines par lot, pas une certification. Un crédit ne remplace pas une autorisation. Cette étape ne publie jamais automatiquement et ne modifie pas les exports MP4.
+
+Le calendrier éditorial, le suivi des performances réelles, la détection visuelle avancée et le recadrage dynamique restent des évolutions possibles, pas des fonctionnalités annoncées comme terminées.
+
+Tests de la revue : `python -m unittest discover -s tests -p "test_editorial.py"`.
