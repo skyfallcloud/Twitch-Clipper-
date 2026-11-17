@@ -181,11 +181,11 @@ def generer(lot, *, categorie="general", credit="", droit="a_verifier",
     return resultat
 
 
-def auto(lot, source):
+def auto(lot, source, *, categorie="general", credit=""):
     source = Path(source)
     match = re.fullmatch(r"VOD-(\d+)", source.stem)
     chat = source.with_name(source.stem + "_chat.json")
-    return generer(lot, chat=chat if chat.is_file() else None,
+    return generer(lot, categorie=categorie, credit=credit, chat=chat if chat.is_file() else None,
                    source_url="https://www.twitch.tv/videos/" + match[1] if match else "")
 
 
