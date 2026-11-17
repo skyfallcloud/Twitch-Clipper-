@@ -167,7 +167,18 @@ def retitrer(args: argparse.Namespace) -> None:
         travail.mkdir()
         for fichier in ("analyse.json", "transcription.json"):
             shutil.copyfile(lot / fichier, travail / fichier)
-        produire_lot(source, travail, dossier_parent, [clip])
+        revue = {}
+        try:
+            revue = clipping.lire_json(lot / "editorial.json")
+            if not isinstance(revue, dict):
+                revue = {}
+        except (OSError, ValueError):
+            pass
+        categorie = revue.get("categorie", "general")
+        credit = revue.get("credit", "")
+        produire_lot(source, travail, dossier_parent, [clip],
+                     categorie=categorie if categorie in editorial.PROFILS else "general",
+                     credit=credit if isinstance(credit, str) else "")
 
 
 def traiter(args: argparse.Namespace, styles: dict) -> None:
