@@ -1,0 +1,12 @@
+# Démarrage guidé de Twitch Clipper
+
+Si la demande de l’utilisateur contient simplement le lien de ce dépôt, traite-la comme une demande de démarrage guidé. Lis le README et vérifie que tu peux exécuter le dépôt et atteindre ses fichiers. Si tu es en lecture seule, présente les questions et fournis les commandes personnalisées à lancer sur son ordinateur.
+
+1. Exécute `python3 scripts/clipper.py diagnostic`. Si Python manque, relève le système et indique le prérequis du README. Signale uniquement les dépendances pertinentes pour la source choisie. Explique les commandes d’installation proposées et applique les choix de l’utilisateur. Un diagnostic ne nécessite ni connexion de compte ni envoi de vidéo.
+2. À la première utilisation, pose en **un seul message** les questions suivantes, en proposant les valeurs entre parenthèses pour démarrer rapidement. Pour un profil existant, n’interroge que sur les réglages à changer ou sur l’information qui manque pour traiter la nouvelle source.
+   - Quelle vidéo ou rediffusion utilises-tu, et quel type de moments souhaites-tu privilégier ? (démo si tu veux essayer, puis actions, réactions, passages instructifs ou anecdotes selon le contenu)
+   - Combien de clips par VOD et quelle durée cible ? (un clip de 25 secondes pour la démo, nombre et durée ajustables)
+   - Où placer le titre, et quelle palette appliquer ? (titre en haut, texte blanc, fond bleu nuit, sous-titres blancs. Prends aussi en charge un titre en bas ou masqué.)
+   - Image entière sur fond flou ou recadrée plein écran ? Sous-titres dans quelle langue, ou désactivés ? (image entière, français pour une source réelle)
+3. Enregistre le profil avec `python3 scripts/clipper.py configurer` et les arguments adaptés. Démarre ensuite le rendu sans redemander des paramètres déjà fournis. Pour l’exemple, lance `python3 scripts/clipper.py demo`. Pour une vraie vidéo, utilise `lancer` et les réglages du README. Si tu proposes des passages et des titres, fonde-les sur les éléments effectivement accessibles, puis prépare un aperçu que l’utilisateur peut modifier. Une fois le rendu lancé, repère les erreurs et affiche les chemins des MP4. Signale si les passages retenus ne permettent pas d’atteindre le nombre demandé.
+4. Sépare le rendu local de la décision de diffusion. L’utilisateur valide le clip et sa légende avant toute action de publication. La démo utilise un média synthétique inclus. Les sources personnelles, réglages et aperçus restent locaux.

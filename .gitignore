@@ -1,0 +1,8 @@
+/exports/
+/media/
+/config.local.json
+/.venv/
+__pycache__/
+*.pyc
+/.env
+/bin/

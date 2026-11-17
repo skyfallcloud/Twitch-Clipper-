@@ -1,0 +1,35 @@
+{
+  "langue": "en",
+  "mots": [
+    {
+      "w": "Welcome to Twitch Clipper.",
+      "s": 1,
+      "e": 2.685
+    },
+    {
+      "w": "This is a short test video.",
+      "s": 6,
+      "e": 7.88
+    },
+    {
+      "w": "Choose a title and its color.",
+      "s": 11,
+      "e": 13.135
+    },
+    {
+      "w": "Try moving it to the bottom.",
+      "s": 16,
+      "e": 17.96
+    },
+    {
+      "w": "Your subtitles stay editable.",
+      "s": 21,
+      "e": 23.51
+    },
+    {
+      "w": "Now try making your own clip.",
+      "s": 27,
+      "e": 29.025
+    }
+  ]
+}
