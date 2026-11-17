@@ -21,7 +21,7 @@ Le chemin du MP4 s’affiche après l’import. Lancer deux fois la même comman
 .venv/bin/python scripts/twitch.py derniere --rendre
 ```
 
-Les aperçus sont sous `exports/automatique/VOD-ID/apercus/`. Le repérage automatique suit le nombre de clips, la durée et le style du profil. Pour appliquer un choix éditorial de passages et de titres, utilise le parcours guidé du README avec les fichiers locaux.
+Par défaut, les aperçus sont sous `exports/automatique/VOD-ID/apercus/`. Le dossier est créé au premier rendu. Pour les recevoir ailleurs, définis `--dossier-clips` avec `clipper.py configurer`. Le repérage automatique suit le nombre de clips, la durée et le style du profil. Pour appliquer un choix éditorial de passages et de titres, utilise le parcours guidé du README avec les fichiers locaux.
 
 ### Surveillance après chaque live
 
@@ -32,7 +32,7 @@ Sur macOS, lance la surveillance permanente avec un LaunchAgent utilisateur. Il 
 python3 scripts/twitch.py arreter
 ```
 
-Utilise `python3` si tu veux simplement importer, en retirant `--rendre`. Les journaux d’exécution se trouvent dans `.clipper/`. Pour tester une exécution planifiée en premier plan, utilise `python3 scripts/twitch.py synchroniser`. Sur macOS ou Linux, `python3 scripts/twitch.py surveiller` propose le même contrôle dans un terminal, jusqu’à `Ctrl+C`. L’option `--intervalle 300` s’exprime en secondes.
+Utilise `python3` si tu veux simplement importer, en retirant `--rendre`. Les journaux d’exécution se trouvent dans `.clipper/`. Pour tester une exécution planifiée en premier plan, utilise `python3 scripts/twitch.py synchroniser`. Dans un terminal, `python3 scripts/twitch.py surveiller` propose le même contrôle jusqu’à `Ctrl+C`. Sous Windows, utilise `py -3 scripts/twitch.py surveiller` ou le Python de ton environnement virtuel. L’option `--intervalle 300` s’exprime en secondes.
 
 La première vérification sert de point de départ. Pour les rediffusions plus anciennes, utilise `derniere` ou leur URL. Après une interruption, la surveillance rattrape les archives encore disponibles depuis ce point de départ. Les sources déjà importées et les rendus terminés sont suivis par identifiant Twitch.
 

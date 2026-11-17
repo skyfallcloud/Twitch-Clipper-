@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
+import os
 from pathlib import Path
 import re
 import shutil
@@ -14,21 +15,24 @@ RACINE = Path(__file__).resolve().parents[1]
 
 
 def disponible() -> str | None:
-    return shutil.which("TwitchDownloaderCLI") or shutil.which(str(RACINE / "bin" / "TwitchDownloaderCLI"))
+    nom = "TwitchDownloaderCLI.exe" if os.name == "nt" else "TwitchDownloaderCLI"
+    return shutil.which(nom) or shutil.which(str(RACINE / "bin" / nom))
 
 
 @contextmanager
 def verrou(chemin: Path):
-    # flock est libéré même si le processus est interrompu.
-    try:
-        import fcntl
-    except ImportError as exc:
-        raise RuntimeError("Import Twitch disponible sur macOS et Linux") from exc
-    with chemin.open("a") as fichier:
+    # Le verrou est libéré à la fermeture du fichier ou à l’arrêt du processus.
+    with chemin.open("a+b") as fichier:
         try:
-            fcntl.flock(fichier, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except BlockingIOError as exc:
-            raise RuntimeError("L’import de cette VOD est déjà en cours") from exc
+            if os.name == "nt":
+                import msvcrt
+                fichier.seek(0)
+                msvcrt.locking(fichier.fileno(), msvcrt.LK_NBLCK, 1)
+            else:
+                import fcntl
+                fcntl.flock(fichier, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError as exc:
+            raise RuntimeError("Verrou local indisponible : une opération est peut-être déjà en cours.") from exc
         yield
 
 

@@ -10,7 +10,7 @@ Si l’assistant te demande une consigne, écris **« Suis le démarrage guidé 
 
 ## Premier aperçu sans compte
 
-Depuis la racine du dépôt, avec Python 3.10 ou plus récent, lance cette commande.
+Télécharge ou clone le dépôt, puis ouvre un terminal à sa racine. Il te faut Python 3.10 ou plus récent et FFmpeg. Sur Windows, remplace `python3` par `py -3` dans les commandes de base.
 
 ```bash
 python3 scripts/clipper.py demo
@@ -27,7 +27,13 @@ python3 scripts/clipper.py demo --nombre-clips 2 --duree 12 --position-titre bas
   --couleur-titre '#FFFFFF' --fond-titre '#003D5C' --couleur-sous-titres '#FFDD66'
 ```
 
-Chaque rendu crée un nouvel aperçu. Pour afficher le diagnostic avec le système, Python et l’espace disque, lance `python3 scripts/clipper.py diagnostic`. Sur macOS, installe depuis [FFmpeg](https://ffmpeg.org/download.html) un build avec libass et libx264. Sous Debian ou Ubuntu, le paquet `ffmpeg` est le point de départ. Relance le diagnostic pour vérifier le build installé. Linux a été testé dans l’environnement de développement. Le parcours public reste à vérifier sur macOS et Windows. L’import Twitch requiert macOS ou Linux.
+Chaque rendu crée un nouvel aperçu. Pour afficher le diagnostic avec le système, Python et l’espace disque, lance `python3 scripts/clipper.py diagnostic`. Voici comment préparer FFmpeg si le diagnostic indique qu’il manque.
+
+- **macOS avec Homebrew**. Lance `brew install ffmpeg-full`, puis `export PATH="$(brew --prefix ffmpeg-full)/bin:$PATH"` dans le terminal utilisé pour le clipper. [Formule Homebrew](https://formulae.brew.sh/formula/ffmpeg-full)
+- **Debian ou Ubuntu**. Installe le paquet `ffmpeg` depuis le gestionnaire de paquets.
+- **Windows**. Prends un build dans les [téléchargements FFmpeg](https://ffmpeg.org/download.html), puis ajoute son dossier `bin` au PATH. Ouvre un nouveau PowerShell et lance `py -3 scripts/clipper.py diagnostic`.
+
+Relance le diagnostic après l’installation. Le rendu est vérifié sous Linux dans l’environnement de développement. Les essais sur de vrais Mac et PC restent à réaliser. Le service d’arrière-plan LaunchAgent est propre à macOS. La commande de surveillance en premier plan est aussi prévue pour Linux et Windows.
 
 ## Ta VOD et tes préférences
 
@@ -36,19 +42,37 @@ python3 scripts/clipper.py configurer --nombre-clips 3 --duree 30 --position-tit
   --cadrage entier --langue fr --priorite "réactions et actions lisibles"
 ```
 
-Le profil `config.local.json` est ignoré par Git. `entier` conserve toute l’image sur fond flou. `recadre` remplit la verticale avec un recadrage centré. Les positions du titre sont `haut`, `bas` et `masque`. Les couleurs du titre, du fond et des sous-titres acceptent le format `#RRGGBB`. Le nombre demandé est une cible, et la durée s’applique au repérage automatique. Ton assistant peut tenir compte de la priorité et fournir des timecodes explicites.
+Le clipper crée le dossier de réception. Par défaut, les résultats vont dans `exports/`. Tu peux choisir un dossier en dehors du dépôt pour les rendus manuels et automatiques.
+
+```bash
+python3 scripts/clipper.py configurer --dossier-clips "$HOME/Movies/Twitch Clipper"
+```
+
+Sous Windows, utilise par exemple `py -3 scripts/clipper.py configurer --dossier-clips "$HOME\Videos\Twitch Clipper"`. Le profil `config.local.json` est ignoré par Git. `entier` conserve toute l’image sur fond flou. `recadre` remplit la verticale avec un recadrage centré. Les positions du titre sont `haut`, `bas` et `masque`. Les couleurs du titre, du fond et des sous-titres acceptent le format `#RRGGBB`. Le nombre demandé est une cible, et la durée s’applique au repérage automatique. Ton assistant peut tenir compte de la priorité et fournir des timecodes explicites.
 
 Pour une vidéo avec parole, prépare le moteur de transcription locale dans un environnement isolé.
 
 ```bash
 python3 -m venv .venv
-.venv/bin/python -m pip install 'faster-whisper>=1.2,<2'
+.venv/bin/python -m pip install -r requirements-transcription.txt
 .venv/bin/python scripts/clipper.py lancer "/chemin/vers/video.mp4" --telecharger-modele
 ```
 
+Sous Windows PowerShell, crée l’environnement avec `py -3 -m venv .venv`, puis utilise `.\.venv\Scripts\python.exe` à la place de `.venv/bin/python`.
+
 `--telecharger-modele` autorise la récupération initiale du modèle Whisper small. Aux prochains rendus, lance avec le même Python et sans cette option pour réutiliser le cache. `--transcription` permet de fournir un JSON au [format de l’exemple](examples/demo.json). Pour une capture sans parole, ajoute `--sans-parole` après l’avoir écoutée. Pour des vidéos parlées où tu veux volontairement masquer les sous-titres, utilise `--sous-titres sans`.
 
-Le moteur propose des fenêtres distinctes selon des signaux audio et vidéo. Pour rendre les passages et titres que tu as choisis avec ton assistant, donne les timecodes et les titres associés dans le même ordre. Pour modifier un seul titre, reprends ce clip et ses timecodes.
+Le moteur propose des fenêtres distinctes selon des signaux audio et vidéo. Pour rendre les passages et titres que tu as choisis avec ton assistant, donne les timecodes et les titres associés dans le même ordre. Chaque lot contient trois titres simples par extrait dans `clips.md`. Les propositions s’appuient sur les mots transcrits lorsqu’ils sont disponibles et sur des repères comme le timecode. Dans le parcours guidé, demande à l’assistant trois propositions qui décrivent le passage visionné.
+
+Si un passage ne reçoit aucune ligne de transcription, le lot sort quand même. `clips.md` et `rapport.json` signalent l’extrait à vérifier avant diffusion.
+
+Pour changer le titre d’un seul clip, donne le dossier du lot affiché à la fin du rendu. Garde le fichier source à son chemin d’origine.
+
+```bash
+python3 scripts/clipper.py retitrer "/chemin/vers/apercus/lot-…" --clip 1 --choix 2
+```
+
+Remplace `--choix 2` par `--titre "Mon titre"` pour écrire le tien. Le clip produit s’ajoute dans un nouveau dossier de lot.
 
 ```bash
 .venv/bin/python scripts/clipper.py lancer "/chemin/vers/video.mp4" --nombre-clips 1 \

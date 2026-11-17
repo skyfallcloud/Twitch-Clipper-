@@ -263,8 +263,9 @@ def valider_choix(data: dict, duration: float) -> list[dict]:
         tags = clip.get("hashtags", [])
         if not isinstance(tags, list) or not all(isinstance(tag, str) for tag in tags):
             raise ValueError("hashtags doit être une liste de textes")
-        if "sans_parole_confirme" in clip and not isinstance(clip["sans_parole_confirme"], bool):
-            raise ValueError("sans_parole_confirme doit être un booléen")
+        for key in ("sans_parole_confirme", "apercu_sans_sous_titres"):
+            if key in clip and not isinstance(clip[key], bool):
+                raise ValueError(f"{key} doit être un booléen")
         clip["debut"], clip["fin"] = start, min(end, duration)
         clips.append(clip)
     clips.sort(key=lambda c: c["debut"])
@@ -389,6 +390,8 @@ def rendre(video: Path, dossier: Path, choix_path: Path, fps: str, final: bool, 
     captions = [sous_titres(c, words) for c in clips]
     for clip, entries in zip(clips, captions):
         if not entries and clip.get("sans_parole_confirme") is not True:
+            if not final and clip.get("apercu_sans_sous_titres") is True:
+                continue
             raise ValueError("Sous-titres absents : compléter la transcription, fournir sous_titres dans le choix, "
                              "ou confirmer sans_parole_confirme=true après écoute")
     signature = hashlib.sha256(json.dumps({"source": source, "clips": clips, "sous_titres": captions, "fps": rate,
@@ -435,7 +438,9 @@ def rendre(video: Path, dossier: Path, choix_path: Path, fps: str, final: bool, 
                 ff("-n", "-ss", str((clip["fin"] - clip["debut"]) * fraction), "-i", name + ".mp4", "-frames:v", "1",
                    "-vf", "scale=360:-2", f"{name}-{label}.jpg", cwd=stage)
             report["clips"].append({"fichier": name + ".mp4", "duree": output["duree"], "fps": output["fps"],
-                "audio": bool(output["audio"]), "sous_titres": len(entries), "decodage_complet": True})
+                "audio": bool(output["audio"]), "sous_titres": len(entries),
+                "sous_titres_a_verifier": not entries and clip.get("sans_parole_confirme") is not True,
+                "decodage_complet": True})
         report["verification_automatique"] = "metadonnees_et_decodage_ok"
         report["temps_secondes"] = round(time.monotonic() - t0, 2)
         ecrire_json(stage / "rapport.json", report)
@@ -444,6 +449,12 @@ def rendre(video: Path, dossier: Path, choix_path: Path, fps: str, final: bool, 
         for i, clip in enumerate(clips, 1):
             md += [f"## short-{i:02d}.mp4", f"Titre : {clip.get('titre', '')}", f"Description : {clip.get('description', '')}",
                    "Hashtags : " + " ".join(clip.get("hashtags", [])), ""]
+            if clip.get("propositions_titre"):
+                md += ["Titres proposés", ""] + [
+                    f"{numero}. {titre}" for numero, titre in enumerate(clip["propositions_titre"], 1)
+                ] + [""]
+            if report["clips"][i - 1]["sous_titres_a_verifier"]:
+                md += ["Cet aperçu est dépourvu de sous-titres. Vérifier s’il contient de la parole.", ""]
         (stage / "clips.md").write_text("\n".join(md), encoding="utf-8")
         shutil.move(str(stage), str(destination))
     print(f"{len(clips)} clip(s) dans {destination} ; contrôles techniques réussis. Validation éditoriale humaine requise.")

@@ -16,6 +16,7 @@ from urllib.parse import urlencode
 
 import services
 import twitch_import
+import clipper
 
 CONFIG = services.DONNEES / "twitch.json"
 API = "https://api.twitch.tv/helix/"
@@ -169,7 +170,7 @@ def synchroniser(twitch: Twitch, user_id: str, rendre: bool = False) -> None:
 
 def preparer_rendu(identifiant: str) -> None:
     path = services.RACINE / "media" / f"VOD-{identifiant}.mp4"
-    dossier = services.RACINE / "exports" / "automatique" / path.stem
+    dossier = clipper.sortie_base(clipper.profil(argparse.Namespace())) / "automatique" / path.stem
     if not any(dossier.glob("apercus/*/rapport.json")):
         subprocess.run([sys.executable, str(services.RACINE / "scripts" / "clipper.py"),
                         "lancer", str(path), "--sortie", str(dossier)], check=True)
