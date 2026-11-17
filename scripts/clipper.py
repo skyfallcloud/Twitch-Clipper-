@@ -12,6 +12,7 @@ import sys
 import tempfile
 
 import clipping
+import editorial
 import twitch_import
 
 RACINE = Path(__file__).resolve().parents[1]
@@ -122,6 +123,10 @@ def produire_lot(source: Path, travail: Path, dossier_parent: Path, clips: list[
     rendu = travail / "apercu"
     for fichier in ("analyse.json", "transcription.json"):
         shutil.copyfile(travail / fichier, rendu / fichier)
+    try:
+        editorial.auto(rendu, source)
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        print(f"Revue éditoriale à régénérer : {exc}", file=sys.stderr)
     base = dossier_parent / "apercus"
     base.mkdir(exist_ok=True)
     destination = base / f"lot-{travail.parent.name.removeprefix('.analyse-')}"
