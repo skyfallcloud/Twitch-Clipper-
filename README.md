@@ -1,6 +1,6 @@
 # Twitch Clipper
 
-Transforme une rediffusion Twitch ou une vidéo locale en aperçus verticaux pour les réseaux sociaux. Tu choisis le nombre de clips par VOD, le style du titre et les sous-titres avant le rendu.
+Transforme une rediffusion Twitch ou une vidéo locale en aperçus verticaux pour les réseaux sociaux. Tu choisis le nombre de clips par VOD, le style du titre et les sous-titres avant le rendu. La surveillance Twitch peut importer les nouvelles VOD et lancer le rendu. PlugKit programme ensuite les clips validés. [Configurer l’automatisation](AUTOMATISATION.md).
 
 ## Ouvrir avec Claude Code ou Codex
 
@@ -55,10 +55,10 @@ Le moteur propose des fenêtres distinctes selon des signaux audio et vidéo. Po
   --passage 14:38 --titre "Le titre que tu as choisi"
 ```
 
-Pour une VOD publique que tu as le droit d’utiliser, installe [TwitchDownloaderCLI](https://github.com/lay295/TwitchDownloader/releases), mets-le dans ton PATH ou dans `bin/`, puis remplace le chemin du MP4 par son URL `https://www.twitch.tv/videos/ID`. Le MP4 peut être réutilisé et le chat est téléchargé s’il est accessible. L’essai public de l’import Twitch avec une vraie VOD reste à faire. La détection automatique par chaîne est une évolution prévue.
+Pour une VOD publique que tu as le droit d’utiliser, installe [TwitchDownloaderCLI](https://github.com/lay295/TwitchDownloader/releases), mets-le dans ton PATH ou dans `bin/`, puis remplace le chemin du MP4 par son URL `https://www.twitch.tv/videos/ID`. Le MP4 peut être réutilisé et le chat est téléchargé s’il est accessible. Pour retrouver la dernière VOD d’une chaîne ou surveiller les prochains lives, suis le [guide d’automatisation](AUTOMATISATION.md#twitch-de-la-chaîne-au-premier-aperçu).
 
 ## Après le montage
 
-Valide le MP4 et sa légende avant de programmer une publication. Le pilote a programmé 25 vidéos sur trois réseaux via Plugkit, soit 75 programmations selon le bilan du projet. Dans cette version, les fichiers MP4 et SRT sont disponibles en local pour la diffusion. La connexion Plugkit et le tutoriel reproductible restent à intégrer au dépôt public.
+Valide le MP4 et sa légende avant de programmer une publication. Le [guide PlugKit](AUTOMATISATION.md#plugkit-du-clip-validé-au-calendrier) explique comment créer un brouillon, programmer sur plusieurs comptes et vérifier le statut par destination. Les connexions à Twitch et PlugKit se configurent avec tes propres comptes.
 
 [Provenance du moteur et du média d’exemple](third_party/NOTICE.md)
