@@ -66,7 +66,7 @@ def brouillons(clip, credit="", source_url=""):
     base = "\n".join(x for x in (corps, provenance) if x)
     avec_tags = "\n".join(x for x in (base, tags) if x)
     return {
-        "tiktok": {"legende": avec_tags},
+        "tiktok": {"legende": "\n".join(x for x in (titre, provenance, tags) if x)},
         "instagram": {"legende": avec_tags},
         "youtube_shorts": {"titre": titre[:90], "legende": avec_tags},
         "x": {"legende": "\n".join(x for x in (titre, provenance) if x)},
@@ -168,14 +168,19 @@ def main():
     parser.add_argument("lot", type=Path)
     parser.add_argument("--categorie", choices=PROFILS, default="general")
     parser.add_argument("--credit", default="")
-    parser.add_argument("--source-url", default="")
+    parser.add_argument("--source-url")
     parser.add_argument("--droits", choices=("a_verifier", "autorise", "interdit"), default="a_verifier")
     parser.add_argument("--spoiler", choices=("a_verifier", "sans_spoiler", "spoiler"), default="a_verifier")
     parser.add_argument("--chat", type=Path)
     args = parser.parse_args()
     try:
+        source = Path(lire(args.lot / "choix-utilise.json")["source"]["chemin"])
+        match = re.fullmatch(r"VOD-(\d+)", source.stem)
+        chat = source.with_name(source.stem + "_chat.json")
+        url = "https://www.twitch.tv/videos/" + match[1] if match else ""
         generer(args.lot, categorie=args.categorie, credit=args.credit, droit=args.droits,
-                spoiler=args.spoiler, chat=args.chat, source_url=args.source_url)
+                spoiler=args.spoiler, chat=args.chat or (chat if chat.is_file() else None),
+                source_url=args.source_url if args.source_url is not None else url)
     except (OSError, ValueError, KeyError, TypeError) as e:
         parser.exit(1, f"Erreur : {e}\n")
     print(args.lot / "editorial.md")
