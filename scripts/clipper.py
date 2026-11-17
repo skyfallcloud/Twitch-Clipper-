@@ -197,7 +197,8 @@ def traiter(args: argparse.Namespace, styles: dict) -> None:
             langue=styles["langue"], assurer_nombre=not args.passage,
         )
         analyse = clipping.lire_json(travail / "analyse.json")
-        candidats = [(item["debut"], item["fin"]) for item in analyse["candidats"]]
+        classes = editorial.candidats_chat(analyse["candidats"], source, meta["duree"]) if not args.passage else analyse["candidats"]
+        candidats = [(item["debut"], item["fin"]) for item in classes]
         passages = args.passage or candidats[:cible]
         if len(args.titre) > len(passages):
             raise ValueError("Il y a plus de titres que de passages disponibles")
